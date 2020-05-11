@@ -52,7 +52,7 @@ def train_model_one_vs_rest(model, vects, target, labels, **kwargs):
     
     
     for i, l in enumerate(labels):
-        cm.append(normalize(confusion_matrix(y_test[:, i], y_pred[:, i]), axis=1, norm='l1'))
+        cm.append(normalize(confusion_matrix(y_test[:, i], y_pred[:, i]), axis=1, norm='l1')*100)
         ax2 = plt.subplot2grid((3, 3), (i//3+1, i%3))
         sns.heatmap(cm[-1], annot=True, square=True, ax=ax2, cmap='Blues')
         ax2.set_title(f'Confusion Matrix \'{l}\'')
