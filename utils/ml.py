@@ -1,4 +1,4 @@
-from sklearn.metrics import accuracy_score, confusion_matrix, hamming_loss
+from sklearn.metrics import accuracy_score, confusion_matrix, hamming_loss, roc_auc_score
 from sklearn.model_selection import KFold
 from sklearn.preprocessing import normalize
 from sklearn.multiclass import OneVsRestClassifier
@@ -11,11 +11,8 @@ kf = KFold(n_splits=10, shuffle=True, random_state=101)
 
 def train_model_one_vs_rest(model, vects, target, labels, **kwargs):
     model_performance = {
-        'loss': [],
+        'score': [],
         'accuracy': [],
-        'precision': [],
-        'recall': [],
-        'f1 score': []
     }
     
     model = OneVsRestClassifier(model)
@@ -29,15 +26,16 @@ def train_model_one_vs_rest(model, vects, target, labels, **kwargs):
 
         model.fit(X_train, y_train)
         y_pred = model.predict(X_test)
-        model_performance['loss'].append(hamming_loss(y_test, y_pred))
+        y_pred_ = model.predict_proba(X_test)
+        model_performance['score'].append(roc_auc_score(y_test, y_pred_))
         model_performance['accuracy'].append(accuracy_score(y_test, y_pred))
 
     fig = plt.figure(figsize=(20, 18))
 
     ax1 = plt.subplot2grid((3, 3), (0, 0), colspan=3)
 
-    ax1.plot(model_performance['loss'], label='loss per iteration')
-    ax1.plot(np.ones(10)*np.mean(model_performance['loss']), '--', label='mean loss')
+    ax1.plot(model_performance['score'], label='score per iteration')
+    ax1.plot(np.ones(10)*np.mean(model_performance['score']), '--', label='mean score')
 
     ax1.plot(model_performance['accuracy'], label='accuracy per iteration')
     ax1.plot(np.ones(10)*np.mean(model_performance['accuracy']), '--', label='mean accuracy')
