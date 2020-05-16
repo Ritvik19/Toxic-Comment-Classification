@@ -1,5 +1,5 @@
 from sklearn.metrics import accuracy_score, confusion_matrix, hamming_loss, roc_auc_score
-from sklearn.model_selection import KFold
+from sklearn.model_selection import KFold, StratifiedKFold
 from sklearn.preprocessing import normalize
 from sklearn.multiclass import OneVsRestClassifier
 
@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 kf = KFold(n_splits=10, shuffle=True, random_state=101)
+skf = StratifiedKFold(n_splits=10, shuffle=True, random_state=101)
 
 def train_model_one_vs_rest(model, vects, target, labels, **kwargs):
     model_performance = {
@@ -56,5 +57,51 @@ def train_model_one_vs_rest(model, vects, target, labels, **kwargs):
         ax2.set_title(f'Confusion Matrix \'{l}\'')
         ax2.set_xlabel('Predicted')
         ax2.set_ylabel('Actual')
+    
+    return model_performance, cm, model
+
+def train_model(model, vects, target, **kwargs):
+    model_performance = {
+        'score': [],
+        'accuracy': [],
+    }
+    
+    for train_indices, test_indices in skf.split(vects, target):
+        X_train = vects[train_indices]
+        y_train = target[train_indices]
+
+        X_test = vects[test_indices]
+        y_test = target[test_indices]
+
+        model.fit(X_train, y_train)
+        y_pred = model.predict(X_test)
+        y_pred_ = model.predict_proba(X_test)
+              
+        model_performance['score'].append(roc_auc_score(y_test, y_pred_[:, 1].reshape((-1,)) ))
+        model_performance['accuracy'].append(accuracy_score(y_test, y_pred))
+
+    fig = plt.figure(figsize=(20, 6))
+
+    ax1 = plt.subplot2grid((1, 3), (0, 0), colspan=2)
+
+    ax1.plot(model_performance['score'], label='score per iteration')
+    ax1.plot(np.ones(10)*np.mean(model_performance['score']), '--', label='mean score')
+
+    ax1.plot(model_performance['accuracy'], label='accuracy per iteration')
+    ax1.plot(np.ones(10)*np.mean(model_performance['accuracy']), '--', label='mean accuracy')
+
+    ax1.grid()
+    ax1.legend()
+    ax1.set_xlabel('fold')
+    ax1.set_ylabel('value')
+    ax1.set_title('Model Performance')
+
+    cm = normalize(confusion_matrix(y_test, y_pred), axis=1, norm='l1')*100
+           
+    ax2 = plt.subplot2grid((1, 3), (0, 2))
+    sns.heatmap(cm, annot=True, square=True, ax=ax2, cmap='Blues')
+    ax2.set_title(f'Confusion Matrix')
+    ax2.set_xlabel('Predicted')
+    ax2.set_ylabel('Actual')
     
     return model_performance, cm, model
