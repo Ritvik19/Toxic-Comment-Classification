@@ -26,4 +26,5 @@ Selected | Approach | Mean AUROC | Mean Accuracy
 :---:|:---|---:|---:
 &#9744; | One Vs Rest | 0.9765 | 85.06%
 &#9744; | NB Featurer | 0.9786 | 96.28%
-&#9745; | Over Sampling | 0.9857 | 95.32%
+&#9744; | Over Sampling | 0.9857 | 95.32%
+&#9745; | SMOTE | 0.9835 | 94.88%
