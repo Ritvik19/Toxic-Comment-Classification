@@ -1,0 +1,70 @@
+:root {
+    --c1: #142850;
+    --c2: #27496d;
+    --c3: #00909e;
+    --c4: #dae1e7;
+}
+
+
+/* body {
+    background-image: linear-gradient(to bottom right, var(--c4), var(--c4), var(--c3), var(--c2));
+        color: var(--c2);
+} */
+
+* h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+th,
+td,
+b,
+input,
+button {
+    font-family: 'Poppins', sans-serif;
+}
+
+b,
+th,
+h1,
+h3 {
+    color: var(--c1);
+}
+
+.container {
+    padding-top: 5%;
+    padding-bottom: 5%;
+    min-height: 100vh;
+}
+
+.content {
+    max-width: 640px;
+    margin: auto;
+}
+
+.sentiment-container {
+    font-size: 0;
+    margin-top: 12px;
+    margin-bottom: 24px;
+}
+
+.sentiment {
+    margin: 0;
+    font-size: 16px;
+    text-align: center;
+    display: inline-block;
+}
+
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--c4);
+}
+
+::-webkit-scrollbar-thumb,
+::-webkit-scrollbar-thumb:hover {
+    background: var(--c3);
+}

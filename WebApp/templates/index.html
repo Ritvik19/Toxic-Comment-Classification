@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Advanced Sentiment Analyzer</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <link href="https://fonts.googleapis.com/css?family=Poppins&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+</head>
+
+<body>
+    <div class="container">
+        <h1 class="w3-jumbo">Advanced Sentiment Analyzer</h1>
+        <p style="text-align: justify;">
+            <b>Advanced Sentiment Analyzer </b> is a multi-headed machine learning model that's capable of detecting different types of toxicity in comment texts
+            <br> Firstly it makes a high level analysis of the latent sentiments of the text
+            <br> Then it analyses the negativity of the text for Identity Hate, Insult, Obscenity, Sever Toxicity, Threat, Toxicity
+
+        </p>
+        <div class="content w3-center">
+            <form action="{{ url_for('predict')}}" method="post">
+                <div class="input-field">
+                    <input type="text" name="text" required="required" />
+                    <label for="text">Text</label>
+                </div>
+                <div class="w3-center">
+                    <button type="submit" class="btn btn-primary">Analyze</button>
+                </div>
+
+            </form>
+        </div>
+
+
+        <br>
+        <br> {% if prediction_text != '' %}
+        <div class="content">
+            <p> <b>Input : </b> {{ inp }}</p>
+        </div>
+
+        <br>
+        <h3 class="w3-xxxlarge">Results</h3> <br>
+        <h4 class="content">High Level Sentiment Analysis:</h4>
+
+        <div class="sentiment-container content w3-yellow">
+            <div class="sentiment w3-green" style="width:{{ prediction_text['Positive'][1] }}%">{{ prediction_text['Positive'][1] }}%</div>
+            <div class="sentiment w3-red" style="width:{{ prediction_text['Positive'][0] }}%">{{ prediction_text['Positive'][0] }}%</div>
+        </div>
+
+        <h4 class="content">Advanced Negativity Analysis:</h4>
+        <h5 class="content">Identity Hate:</h5>
+
+        <div class="sentiment-container content w3-yellow">
+            <div class="sentiment w3-green" style="width:{{ prediction_text['IdentityHate'][1] }}%">
+                {{ prediction_text['IdentityHate'][1] }}%</div>
+            <div class="sentiment w3-red" style="width:{{ prediction_text['IdentityHate'][0] }}%">
+                {{ prediction_text['IdentityHate'][0] }}%</div>
+        </div>
+
+        <h5 class="content">Insult:</h5>
+
+        <div class="sentiment-container content w3-yellow">
+            <div class="sentiment w3-green" style="width:{{ prediction_text['Insult'][1] }}%">
+                {{ prediction_text['Insult'][1] }}%</div>
+            <div class="sentiment w3-red" style="width:{{ prediction_text['Insult'][0] }}%">
+                {{ prediction_text['Insult'][0] }}%</div>
+        </div>
+
+        <h5 class="content">Obscenity:</h5>
+
+        <div class="sentiment-container content w3-yellow">
+            <div class="sentiment w3-green" style="width:{{ prediction_text['Obscene'][1] }}%">
+                {{ prediction_text['Obscene'][1] }}%</div>
+            <div class="sentiment w3-red" style="width:{{ prediction_text['Obscene'][0] }}%">
+                {{ prediction_text['Obscene'][0] }}%</div>
+        </div>
+
+        <h5 class="content">Severe Toxicity:</h5>
+
+        <div class="sentiment-container content w3-yellow">
+            <div class="sentiment w3-green" style="width:{{ prediction_text['SevereToxic'][1] }}%">
+                {{ prediction_text['SevereToxic'][1] }}%</div>
+            <div class="sentiment w3-red" style="width:{{ prediction_text['SevereToxic'][0] }}%">
+                {{ prediction_text['SevereToxic'][0] }}%</div>
+        </div>
+
+        <h5 class="content">Threat:</h5>
+
+        <div class="sentiment-container content w3-yellow">
+            <div class="sentiment w3-green" style="width:{{ prediction_text['Threat'][1] }}%">
+                {{ prediction_text['Threat'][1] }}%</div>
+            <div class="sentiment w3-red" style="width:{{ prediction_text['Threat'][0] }}%">
+                {{ prediction_text['Threat'][0] }}%</div>
+        </div>
+
+        <h5 class="content">Toxicity:</h5>
+
+        <div class="sentiment-container content w3-yellow">
+            <div class="sentiment w3-green" style="width:{{ prediction_text['Toxic'][1] }}%">
+                {{ prediction_text['Toxic'][1] }}%</div>
+            <div class="sentiment w3-red" style="width:{{ prediction_text['Toxic'][0] }}%">
+                {{ prediction_text['Toxic'][0] }}%</div>
+        </div>
+
+        <h4 class="content">Vader Sentiment Analysis:</h4>
+
+        <div class="sentiment-container content w3-yellow">
+            <div class="sentiment w3-green" style="width:{{ prediction_text['Vader'][2] }}%">
+                {{ prediction_text['Vader'][2] }}%</div>
+            <div class="sentiment w3-yellow" style="width:{{ prediction_text['Vader'][1] }}%">
+                {{ prediction_text['Vader'][1] }}%</div>
+            <div class="sentiment w3-red" style="width:{{ prediction_text['Vader'][0] }}%">
+                {{ prediction_text['Vader'][0] }}%</div>
+        </div>
+        <br><br><br> {% endif %}
+    </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+</body>
+
+</html>
