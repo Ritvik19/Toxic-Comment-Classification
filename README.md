@@ -4,7 +4,7 @@ Discussing things you care about can be difficult. The threat of abuse and haras
 
 **Problem Statement:** to build a multi-headed model that’s capable of detecting different types of of toxicity like threats, obscenity, insults, and identity-based hate
 
-**Source:** [Kaggle](https://www.kaggle.com/c/jigsaw-toxic-comment-classification-challenge/overview)
+**Sources:** [Kaggle-Toxic Comment Classification Challenge](https://www.kaggle.com/c/jigsaw-toxic-comment-classification-challenge/) and [Kaggle-Jigsaw Unintended Bias in Toxicity Classification](https://www.kaggle.com/c/jigsaw-unintended-bias-in-toxicity-classification/)
 
 **Project Objective:** a model to prerform advanced sentiment analysis
 
@@ -24,7 +24,7 @@ ___
 
 Selected | Approach | Mean AUROC | Mean Accuracy
 :---:|:---|---:|---:
-&#9744; | One Vs Rest | 0.9765 | 85.06%
-&#9744; | NB Featurer | 0.9786 | 96.28%
-&#9744; | Over Sampling | 0.9857 | 95.32%
-&#9745; | SMOTE | 0.9835 | 94.88%
+&#9744; | One Vs Rest | 0.973 | 78.6%
+&#9744; | NB Featurer | 0.9748 | 94.92%
+&#9744; | Over Sampling | 0.9826 | 94.90%
+&#9745; | SMOTE | 0.9875 | 95.61%
