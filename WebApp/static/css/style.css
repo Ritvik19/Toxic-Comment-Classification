@@ -1,15 +1,14 @@
 :root {
     --c1: #142850;
     --c2: #27496d;
-    --c3: #00909e;
+    --c3: #607d8b;
     --c4: #dae1e7;
 }
 
-
-/* body {
-    background-image: linear-gradient(to bottom right, var(--c4), var(--c4), var(--c3), var(--c2));
-        color: var(--c2);
-} */
+body {
+    background-image: url('/static/whitebg.jpg');
+    background-size: cover;
+}
 
 * h1,
 h2,
