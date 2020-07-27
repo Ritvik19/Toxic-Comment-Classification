@@ -1,40 +1,44 @@
 from flask import Flask, request, jsonify, render_template
 from application import *
+import json
+import numpy as np
 
 app = Flask(__name__)
 
 @app.route('/')
 def home():
-    return render_template('index.html', prediction_text='')
+    return render_template('index.html', results='')
 
 @app.route('/predict',methods=['POST'])
 def predict():
 
     inp = str(list(request.form.values())[0])
-    features = generateFeatures(inp)
-    prediction = getPredictions(features, model0)
+    features1 = generateFeatures(inp, vectorizer1)
+    features2 = generateFeatures(inp, vectorizer2)
     
-    identity_hate = getPredictions(features, models[0])
-    insult = getPredictions(features, models[1])
-    obscene = getPredictions(features, models[2])
-    severe_toxic = getPredictions(features, models[3])
-    threat = getPredictions(features, models[4])
-    toxic = getPredictions(features, models[5])
-    
+    model1_pred = list(getPredictions(features1, model_1))
+    model2_pred = list(getPredictions(features2, model_2))
+            
     vader = getVader(inp)
     
-    prediction_text = {
-        'Positive' : list(map(lambda x: round(x*100, 2), prediction)),
-        'IdentityHate' :  list(map(lambda x: round(x*100, 2), identity_hate)),
-        'Insult':  list(map(lambda x: round(x*100, 2), insult)),
-        'Obscene':  list(map(lambda x: round(x*100, 2), obscene)),
-        'SevereToxic':  list(map(lambda x: round(x*100, 2), severe_toxic)),
-        'Threat':  list(map(lambda x: round(x*100, 2), threat)),
-        'Toxic':  list(map(lambda x: round(x*100, 2), toxic)),
-        'Vader': list(map(lambda x: round(x*100, 2), vader)),
-    }
+    results ={
+        'overview' : {
+            'positive': list(map(
+                lambda x: round(x*100, 2), 
+                [model1_pred[0], model2_pred[0], (model1_pred[0]+ model2_pred[0])/2]
+            )),
+            'negative': list(map(
+                lambda x: round((1-x)*100, 2), 
+                [model1_pred[0], model2_pred[0], (model1_pred[0]+ model2_pred[0])/2]
+            ))
+        },
+        'vader': vader,
+        'model1': list(map(lambda x: round(x*100, 2), model1_pred[1:])),
+        'model2': list(map(lambda x: round(x*100, 2), model2_pred[1:])),
 
-    return render_template('index.html', inp=inp, prediction_text=prediction_text)
+    }
+    
+    return render_template('index.html', inp=inp, results=results, debug=0)
 
 if __name__ == "__main__":
     app.run(debug=True)

@@ -36,76 +36,34 @@
 
 
             <br>
-            <br> {% if prediction_text != '' %}
+            <br> {% if results != '' %}
             <div>
                 <div class="content">
                     <p> <b>Input : </b> {{ inp }}</p>
                 </div>
 
                 <br>
-                <h3 class="w3-xxxlarge">Results</h3> <br>
-                <h4 class="content">High Level Sentiment Analysis:</h4>
+                <h3 class="w3-xxxlarge">Results</h3> <br> {% if debug == 1 %}
 
-                <div class="sentiment-container content w3-yellow">
-                    <div class="sentiment w3-green" style="width:{{ prediction_text['Positive'][1] }}%">
-                        {{ prediction_text['Positive'][1] }}%</div>
-                    <div class="sentiment w3-red" style="width:{{ prediction_text['Positive'][0] }}%">
-                        {{ prediction_text['Positive'][0] }}%</div>
+                <p>{{ results }}</p>
+                {% endif %}
+
+                <div style="display: grid;" class="w3-border w3-border-blue-gray">
+                    <div style="grid-column: 1 / 1; grid-row: 1 / 2;" class="w3-border w3-border-blue-gray w3-padding-large">
+                        <h2 class="w3-center">Vader Sentiment Analysis</h2>
+                        <canvas height=150 id="chart_pie"></canvas>
+                    </div>
+                    <div style="grid-column: 1 / 1; grid-row: 3 / 3;" class="w3-border w3-border-blue-gray w3-padding-large">
+                        <h2 class="w3-center">Binary Sentiment Analysis</h2>
+                        <canvas height=150 id="chart_bar"></canvas>
+                    </div>
+                    <div style="grid-row: 1 / 5; grid-column: 2 / 6;" class="w3-border w3-border-blue-gray w3-padding-large">
+                        <h2 class="w3-center">Negative Sentiment Analysis</h2>
+                        <canvas height=270 id="chart_radar"></canvas>
+                    </div>
                 </div>
 
-                <h4 class="content">Advanced Negativity Analysis:</h4>
-                <h5 class="content">Identity Hate:</h5>
 
-                <div class="sentiment-container content w3-gray">
-                    <div class="sentiment w3-red" style="width:{{ prediction_text['IdentityHate'][1] }}%">
-                        {{ prediction_text['IdentityHate'][1] }}%</div>
-                </div>
-
-                <h5 class="content">Insult:</h5>
-
-                <div class="sentiment-container content w3-gray">
-                    <div class="sentiment w3-red" style="width:{{ prediction_text['Insult'][1] }}%">
-                        {{ prediction_text['Insult'][1] }}%</div>
-                </div>
-
-                <h5 class="content">Obscenity:</h5>
-
-                <div class="sentiment-container content w3-gray">
-                    <div class="sentiment w3-red" style="width:{{ prediction_text['Obscene'][1] }}%">
-                        {{ prediction_text['Obscene'][1] }}%</div>
-                </div>
-
-                <h5 class="content">Severe Toxicity:</h5>
-
-                <div class="sentiment-container content w3-gray">
-                    <div class="sentiment w3-red" style="width:{{ prediction_text['SevereToxic'][1] }}%">
-                        {{ prediction_text['SevereToxic'][1] }}%</div>
-                </div>
-
-                <h5 class="content">Threat:</h5>
-
-                <div class="sentiment-container content w3-gray">
-                    <div class="sentiment w3-red" style="width:{{ prediction_text['Threat'][1] }}%">
-                        {{ prediction_text['Threat'][1] }}%</div>
-                </div>
-
-                <h5 class="content">Toxicity:</h5>
-
-                <div class="sentiment-container content w3-gray">
-                    <div class="sentiment w3-red" style="width:{{ prediction_text['Toxic'][1] }}%">
-                        {{ prediction_text['Toxic'][1] }}%</div>
-                </div>
-
-                <h4 class="content">Vader Sentiment Analysis:</h4>
-
-                <div class="sentiment-container content w3-yellow">
-                    <div class="sentiment w3-green" style="width:{{ prediction_text['Vader'][2] }}%">
-                        {{ prediction_text['Vader'][2] }}%</div>
-                    <div class="sentiment w3-yellow" style="width:{{ prediction_text['Vader'][1] }}%">
-                        {{ prediction_text['Vader'][1] }}%</div>
-                    <div class="sentiment w3-red" style="width:{{ prediction_text['Vader'][0] }}%">
-                        {{ prediction_text['Vader'][0] }}%</div>
-                </div>
                 <br><br><br>
             </div>
             {% endif %}
@@ -114,6 +72,99 @@
     </div>
     <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.bundle.js"></script>
+    {% if results != '' %}
+    <script>
+        var model1 = JSON.parse("{{ results['model1'] }}")
+        var model2 = JSON.parse("{{ results['model2'] }}")
+
+        var positive = JSON.parse("{{ results['overview']['positive'] }}")
+        var negative = JSON.parse("{{ results['overview']['negative'] }}")
+
+        var vader = JSON.parse("{{ results['vader'] }}");
+
+        var ctx0 = document.getElementById('chart_pie');
+        var ctx1 = document.getElementById('chart_radar');
+        var ctx2 = document.getElementById('chart_bar');
+
+        var piechart = new Chart(ctx0, {
+            type: 'doughnut',
+            data: {
+                labels: ['Negative', 'Neutral', 'Positive'],
+                datasets: [{
+                    data: vader,
+                    backgroundColor: ['rgba(244,67,54, 0.4)', 'rgba(255,235,59, 0.4)', 'rgba(76,175,80, 0.4)'],
+                    borderColor: ['rgba(244,67,54, 1)', 'rgba(255,235,59, 1)', 'rgba(76,175,80, 1)'],
+                }]
+            },
+            options: {}
+        });
+
+        var radarchart = new Chart(ctx1, {
+            type: 'radar',
+            data: {
+                labels: ['Identity Hate', 'Insult', 'Obscenity', 'Sever Toxicity', 'Threat', 'Toxicity'],
+                datasets: [{
+                    label: 'Model1',
+                    data: model1,
+                    backgroundColor: [
+                        'rgba(246, 75, 60, 0.15)'
+                    ],
+                    borderColor: [
+                        'rgba(246, 75, 60, 1)'
+                    ],
+                    borderWidth: 1
+                }, {
+                    label: 'Model2',
+                    data: model2,
+                    backgroundColor: [
+                        'rgba(200, 25, 18, 0.15)'
+                    ],
+                    borderColor: [
+                        'rgba(200, 25, 18, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                /*    scale: {
+                        ticks: {
+                            min: 0,
+                            max: 100
+                        }
+                    }*/
+            }
+        });
+
+        var barchart = new Chart(ctx2, {
+            type: 'bar',
+            data: {
+                labels: ['Model1', 'Model2', "Mean"],
+                datasets: [{
+                    label: 'Positive',
+                    data: positive,
+                    backgroundColor: 'rgba(76,175,80, 0.65)',
+                    borderColor: 'rgba(76,175,80, 1)',
+                }, {
+                    label: 'Negative',
+                    data: negative,
+                    backgroundColor: 'rgba(244,67,54, 0.65)',
+                    borderColor: 'rgba(244,67,54, 1)',
+                }]
+            },
+            options: {
+                scales: {
+                    xAxes: [{
+                        stacked: true
+                    }],
+                    yAxes: [{
+                        stacked: true
+                    }]
+                }
+            }
+        });
+    </script>
+    {% endif %}
 </body>
 
 </html>

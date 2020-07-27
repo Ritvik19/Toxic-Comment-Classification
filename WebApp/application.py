@@ -2,36 +2,31 @@ import pickle
 import numpy as np
 import pandas as pd
 
-import re, nltk
-from nltk.corpus import stopwords
-from nltk.stem import PorterStemmer, WordNetLemmatizer
-
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer 
 
-def spell_correct(text):
-    text = re.sub(r"can\'t", "can not", text)
+import nltk, re
+from nltk.stem.porter import PorterStemmer
+from nltk.stem import WordNetLemmatizer
+
+def expand_contractions(text):
+    text = re.sub(r"can't", "can not", text)
     text = re.sub(r"what's", "what is ", text)
-    text = re.sub(r"\'s", " ", text)
-    text = re.sub(r"\'ve", " have ", text)
+    text = re.sub(r"'s", " ", text)
+    text = re.sub(r"'ve", " have ", text)
     text = re.sub(r"n't", " not ", text)
     text = re.sub(r"i'm", "i am ", text)
-    text = re.sub(r"\'re", " are ", text)
-    text = re.sub(r"\'d", " would ", text)
-    text = re.sub(r"\'ll", " will ", text)
-    text = re.sub(r"\0s", "0", text)    
+    text = re.sub(r"'re", " are ", text)
+    text = re.sub(r"'d", " would ", text)
+    text = re.sub(r"'ll", " will ", text)
     return text
 
 def remove_url(text):
-    URL_REGEX = re.compile(r'''((http[s]?://)[^ <>'"{}|\\^`[\]]*)''')
+    URL_REGEX = re.compile(r'''((http[s]?://)[^ <>'"{}|\^`[\]]*)''')
     return URL_REGEX.sub(r' ', text)
 
 def remove_handles(text):
     HANDLES_REGEX = re.compile(r'@\S+')
     return HANDLES_REGEX.sub(r' ', text)
-
-def remove_incomplete_last_word(text):
-    INCOMPLETE_LAST_WORD_REGEX = re.compile(r'\S+…')
-    return INCOMPLETE_LAST_WORD_REGEX.sub(r' ', text )
 
 remove_punc = lambda x : re.sub(r"\W", ' ', x)
 
@@ -43,7 +38,9 @@ remove_shortwords = lambda x: ' '.join(word for word in x.split() if len(word) >
 
 lower_case = lambda x : x.lower()
 
-stop_words = set(stopwords.words('english'))
+with open('stopwords.txt') as f:
+    sw = map(lambda x : x.strip(), f.readlines())
+stop_words = set(nltk.corpus.stopwords.words('english'))|set(sw)
 remove_stopwords = lambda x: ' '.join(word for word in x.split() if word not in stop_words)
 
 ps = PorterStemmer()
@@ -63,7 +60,7 @@ def cleanText(x, rsw, stm, lem, tgps):
     x = str(x)
     x = remove_url(x)
     x = lower_case(x)
-    x = spell_correct(x)
+    x = expand_contractions(x)
     x = remove_punc(x)
     x = remove_num(x)
     x = remove_extra_spaces(x)
@@ -79,15 +76,16 @@ def cleanText(x, rsw, stm, lem, tgps):
         x = tag_pos(x)
     return x
 
+vectorizer1 = pickle.load(open('Vectorizer.pkl', 'rb'))
+vectorizer2 = pickle.load(open('Vectorizer-V2.pkl', 'rb'))
 
-vectorizer = pickle.load(open('Vectorizer.pkl', 'rb'))
-
-model0, *models = pickle.load(open('SMOTE.pkl', 'rb'))
+model_1 = pickle.load(open('LR-OneVsRest.pkl', 'rb'))
+model_2 = pickle.load(open('LR-OneVsRest-V2.pkl', 'rb'))
 
 sia_obj = SentimentIntensityAnalyzer() 
 
-def generateFeatures(inp):
-    features = vectorizer.transform([str(inp)])
+def generateFeatures(inp, vectorizer):
+    features = vectorizer.transform([cleanText(str(inp), True, False, True, False)])
     return features
 
 def getPredictions(feats, model):
@@ -95,4 +93,4 @@ def getPredictions(feats, model):
 
 def getVader(inp):
     sentiment_dict = sia_obj.polarity_scores(inp) 
-    return [sentiment_dict['neg'], sentiment_dict['neu'] , sentiment_dict['pos']]
+    return list(map(lambda x: round(x*100, 2), [sentiment_dict['neg'], sentiment_dict['neu'] , sentiment_dict['pos']]))

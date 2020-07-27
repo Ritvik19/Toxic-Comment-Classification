@@ -30,17 +30,13 @@ ___
 
 **Feature Extraction:** Sublinear Smoothed TFIDF
 
-**Algorithm:** Multinomial Naive Bayes and Logistic Regression
+**Algorithm:** OVR Logistic Regression
 
 ___
 
 ### Performance Summary
 
-Selected | Approach | Algorithm | Mean AUROC | Mean Accuracy | Mean F1
-:---:|:---|:---|---:|---:|---:
-&#9744; | One Vs Rest | Naive Bayes | 0.8176 | 0.9335 | 0.0835
-&#9744; | One Vs Rest | Logistic Regression | 0.9765 | 0.8576 | 0.5277
-&#9745; | Random Oversampling | Naive Bayes | 0.9193 | 0.8832 | 0.9184
-&#9745; | Random Oversampling | Logistic Regression | 0.9738 | 0.9551 | 0.9441
-&#9745; | SMOTE | Naive Bayes | 0.9185 | 0.9163 | 0.9391
-&#9745; | SMOTE | Logistic Regression | 0.9718 | 0.9651 | 0.9691
+Approach | Algorithm | Mean AUROC | Mean Accuracy | Mean F1
+:---|:---|---:|---:|---:
+Sampled Data | Logistic Regression | 0.9745 | 0.7812 | 0.8926
+Complete Data | Logistic Regression | 0.9717 | 0.8687 | 0.9046
