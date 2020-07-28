@@ -3,6 +3,7 @@ import numpy as np
 import pandas as pd
 
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer 
+from textblob import TextBlob
 
 import nltk, re
 from nltk.stem.porter import PorterStemmer
@@ -80,7 +81,9 @@ vectorizer1 = pickle.load(open('Vectorizer.pkl', 'rb'))
 vectorizer2 = pickle.load(open('Vectorizer-V2.pkl', 'rb'))
 
 model_1 = pickle.load(open('LR-OneVsRest.pkl', 'rb'))
-model_2 = pickle.load(open('LR-OneVsRest-V2.pkl', 'rb'))
+model_2 = pickle.load(open('BC-OneVsRest.pkl', 'rb'))
+model_3 = pickle.load(open('LR-OneVsRest-V2.pkl', 'rb'))
+model_4 = pickle.load(open('SC-OneVsRest-V2.pkl', 'rb'))
 
 sia_obj = SentimentIntensityAnalyzer() 
 
@@ -94,3 +97,8 @@ def getPredictions(feats, model):
 def getVader(inp):
     sentiment_dict = sia_obj.polarity_scores(inp) 
     return list(map(lambda x: round(x*100, 2), [sentiment_dict['neg'], sentiment_dict['neu'] , sentiment_dict['pos']]))
+
+def getTB(inp):
+    sentiment, subjectivity = TextBlob(inp).sentiment
+    sentiment, subjectivity = round(((sentiment+1)/2)*100, 2), round(subjectivity*100, 2)
+    return list((sentiment, 100-sentiment, subjectivity, 100 - subjectivity))

@@ -17,25 +17,29 @@ def predict():
     features2 = generateFeatures(inp, vectorizer2)
     
     model1_pred = list(getPredictions(features1, model_1))
-    model2_pred = list(getPredictions(features2, model_2))
+    model2_pred = list(getPredictions(features1, model_2))
+    model3_pred = list(getPredictions(features2, model_3))
+    model4_pred = list(getPredictions(features2, model_4))
             
     vader = getVader(inp)
+    textblob = getTB(inp)
+    
+    overview = [
+        model1_pred[0], model2_pred[0], model3_pred[0], model4_pred[0],
+        np.mean([model1_pred[0], model2_pred[0], model3_pred[0], model4_pred[0]])
+    ]
     
     results ={
         'overview' : {
-            'positive': list(map(
-                lambda x: round(x*100, 2), 
-                [model1_pred[0], model2_pred[0], (model1_pred[0]+ model2_pred[0])/2]
-            )),
-            'negative': list(map(
-                lambda x: round((1-x)*100, 2), 
-                [model1_pred[0], model2_pred[0], (model1_pred[0]+ model2_pred[0])/2]
-            ))
+            'positive': list(map(lambda x: round(x*100, 2), overview)),
+            'negative': list(map(lambda x: round((1-x)*100, 2), overview))
         },
         'vader': vader,
+        'textblob': textblob,
         'model1': list(map(lambda x: round(x*100, 2), model1_pred[1:])),
         'model2': list(map(lambda x: round(x*100, 2), model2_pred[1:])),
-
+        'model3': list(map(lambda x: round(x*100, 2), model3_pred[1:])),
+        'model4': list(map(lambda x: round(x*100, 2), model4_pred[1:])),
     }
     
     return render_template('index.html', inp=inp, results=results, debug=0)

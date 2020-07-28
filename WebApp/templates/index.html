@@ -49,17 +49,30 @@
                 {% endif %}
 
                 <div style="display: grid;" class="w3-border w3-border-blue-gray">
-                    <div style="grid-column: 1 / 1; grid-row: 1 / 2;" class="w3-border w3-border-blue-gray w3-padding-large">
+                    <div style="grid-column: 1 / 2; grid-row: 1 / 2;" class="w3-padding-large">
                         <h2 class="w3-center">Vader Sentiment Analysis</h2>
                         <canvas height=150 id="chart_pie"></canvas>
+
                     </div>
-                    <div style="grid-column: 1 / 1; grid-row: 3 / 3;" class="w3-border w3-border-blue-gray w3-padding-large">
+                    <div style="grid-column: 3 / 6; grid-row: 1 / 2;" class="w3-padding-large">
                         <h2 class="w3-center">Binary Sentiment Analysis</h2>
                         <canvas height=150 id="chart_bar"></canvas>
+
                     </div>
-                    <div style="grid-row: 1 / 5; grid-column: 2 / 6;" class="w3-border w3-border-blue-gray w3-padding-large">
+                    <div style="grid-column: 1 / 2; grid-row: 3 / 4;" class="w3-padding-large">
+                        <h2 class="w3-center">TextBlob Sentiment Analysis</h2>
+                        <canvas height=150 id="chart_doughnut1"></canvas>
+
+                    </div>
+                    <div style="grid-column: 1 / 2; grid-row: 5 / 6;" class="w3-padding-large">
+                        <h2 class="w3-center">TextBlob Subjectivity Analysis</h2>
+                        <canvas height=150 id="chart_doughnut2"></canvas>
+
+                    </div>
+                    <div style="grid-column: 2 / 6; grid-row: 3 / 6" class="w3-padding-large">
                         <h2 class="w3-center">Negative Sentiment Analysis</h2>
-                        <canvas height=270 id="chart_radar"></canvas>
+                        <canvas height=300 id="chart_radar"></canvas>
+
                     </div>
                 </div>
 
@@ -77,18 +90,23 @@
     <script>
         var model1 = JSON.parse("{{ results['model1'] }}")
         var model2 = JSON.parse("{{ results['model2'] }}")
+        var model3 = JSON.parse("{{ results['model3'] }}")
+        var model4 = JSON.parse("{{ results['model4'] }}")
 
         var positive = JSON.parse("{{ results['overview']['positive'] }}")
         var negative = JSON.parse("{{ results['overview']['negative'] }}")
 
         var vader = JSON.parse("{{ results['vader'] }}");
+        var textblob = JSON.parse("{{ results['textblob'] }}");
 
         var ctx0 = document.getElementById('chart_pie');
-        var ctx1 = document.getElementById('chart_radar');
-        var ctx2 = document.getElementById('chart_bar');
+        var ctx1 = document.getElementById('chart_bar');
+        var ctx2 = document.getElementById('chart_doughnut1');
+        var ctx3 = document.getElementById('chart_doughnut2');
+        var ctx4 = document.getElementById('chart_radar');
 
         var piechart = new Chart(ctx0, {
-            type: 'doughnut',
+            type: 'pie',
             data: {
                 labels: ['Negative', 'Neutral', 'Positive'],
                 datasets: [{
@@ -100,46 +118,10 @@
             options: {}
         });
 
-        var radarchart = new Chart(ctx1, {
-            type: 'radar',
-            data: {
-                labels: ['Identity Hate', 'Insult', 'Obscenity', 'Sever Toxicity', 'Threat', 'Toxicity'],
-                datasets: [{
-                    label: 'Model1',
-                    data: model1,
-                    backgroundColor: [
-                        'rgba(246, 75, 60, 0.15)'
-                    ],
-                    borderColor: [
-                        'rgba(246, 75, 60, 1)'
-                    ],
-                    borderWidth: 1
-                }, {
-                    label: 'Model2',
-                    data: model2,
-                    backgroundColor: [
-                        'rgba(200, 25, 18, 0.15)'
-                    ],
-                    borderColor: [
-                        'rgba(200, 25, 18, 1)'
-                    ],
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                /*    scale: {
-                        ticks: {
-                            min: 0,
-                            max: 100
-                        }
-                    }*/
-            }
-        });
-
-        var barchart = new Chart(ctx2, {
+        var barchart = new Chart(ctx1, {
             type: 'bar',
             data: {
-                labels: ['Model1', 'Model2', "Mean"],
+                labels: ['Model1', 'Model2', 'Model3', 'Model4', 'Mean'],
                 datasets: [{
                     label: 'Positive',
                     data: positive,
@@ -161,6 +143,88 @@
                         stacked: true
                     }]
                 }
+            }
+        });
+
+        var doughnutchart1 = new Chart(ctx2, {
+            type: 'doughnut',
+            data: {
+                labels: ['Negative', 'Positive'],
+                datasets: [{
+                    data: [textblob[1], textblob[0]],
+                    backgroundColor: ['rgba(244,67,54, 0.4)', 'rgba(76,175,80, 0.4)'],
+                    borderColor: ['rgba(244,67,54, 1)', 'rgba(76,175,80, 1)'],
+                }]
+            },
+            options: {}
+        });
+
+        var doughnutchart2 = new Chart(ctx3, {
+            type: 'doughnut',
+            data: {
+                labels: ['Subjectivity', 'Objectivity'],
+                datasets: [{
+                    data: [textblob[3], textblob[2]],
+                    backgroundColor: ['rgba(255,193,7, 0.4)', 'rgba(63,81,181, 0.4)'],
+                    borderColor: ['rgba(255,193,7, 1)', 'rgba(63,81,181, 1)'],
+                }]
+            },
+            options: {}
+        });
+
+        var radarchart = new Chart(ctx4, {
+            type: 'radar',
+            data: {
+                labels: ['Identity Hate', 'Insult', 'Obscenity', 'Sever Toxicity', 'Threat', 'Toxicity'],
+                datasets: [{
+                    label: 'Model1',
+                    data: model1,
+                    backgroundColor: [
+                        'rgba(81,24,24, 0.15)'
+                    ],
+                    borderColor: [
+                        'rgba(81,24,24, 1)'
+                    ],
+                    borderWidth: 1
+                }, {
+                    label: 'Model2',
+                    data: model2,
+                    backgroundColor: [
+                        'rgba(144,12,63, 0.15)'
+                    ],
+                    borderColor: [
+                        'rgba(144,12,63, 1)'
+                    ],
+                    borderWidth: 1
+                }, {
+                    label: 'Model3',
+                    data: model3,
+                    backgroundColor: [
+                        'rgba(199,0,57, 0.15)'
+                    ],
+                    borderColor: [
+                        'rgba(199,0,57, 1)'
+                    ],
+                    borderWidth: 1
+                }, {
+                    label: 'Model4',
+                    data: model4,
+                    backgroundColor: [
+                        'rgba(255,87,51, 0.15)'
+                    ],
+                    borderColor: [
+                        'rgba(255,87,51, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                /*    scale: {
+                        ticks: {
+                            min: 0,
+                            max: 100
+                        }
+                    }*/
             }
         });
     </script>
